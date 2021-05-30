@@ -1,13 +1,12 @@
-plotly.graph_objects as go
-pandas as pd
-numpy as np
+plotly.graph_objects
+pandas
+numpy
 dash
-dash_core_components as dcc
-dash_html_components as html
-dash.dependencies import Input, Output
-pandas as pd
-plotly.graph_objs as go
-plotly.subplots import make_subplots
-plotly import tools
-plotly.express as px
-skimage import io
+dash_core_components
+dash_html_components
+dash.dependencies
+pandas
+plotly.subplots
+plotly
+plotly.express
+skimage
