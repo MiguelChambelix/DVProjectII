@@ -1,4 +1,4 @@
-plotly.graph_objects
+plotly
 pandas
 numpy
 dash
@@ -6,7 +6,4 @@ dash_core_components
 dash_html_components
 dash.dependencies
 pandas
-plotly.subplots
-plotly
-plotly.express
 skimage
