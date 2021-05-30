@@ -8,3 +8,4 @@ dash
 pandas
 scikit-image
 gunicorn
+openpyxl
