@@ -12,15 +12,15 @@ from plotly import tools
 import plotly.express as px
 from skimage import io
 
-currencies = pd.read_excel(r"C:\Users\migue\OneDrive\Documentos\Nova IMS\DV\Project II\Currencies.xlsx", "Currency",
+currencies = pd.read_excel("Currencies.xlsx", "Currency",
                            engine='openpyxl')
-prices = pd.read_excel(r"C:\Users\migue\OneDrive\Documentos\Nova IMS\DV\Project II\Currencies.xlsx", "Prices",
+prices = pd.read_excel("Currencies.xlsx", "Prices",
                        engine='openpyxl')
-attributes = pd.read_excel(r"C:\Users\migue\OneDrive\Documentos\Nova IMS\DV\Project II\Currencies.xlsx", "Attribute",
+attributes = pd.read_excel("Currencies.xlsx", "Attribute",
                            engine='openpyxl')
-pros = pd.read_excel(r"C:\Users\migue\OneDrive\Documentos\Nova IMS\DV\Project II\Currencies.xlsx", "Description",
+pros = pd.read_excel("Currencies.xlsx", "Description",
                      engine='openpyxl')
-pictures = pd.read_excel(r"C:\Users\migue\OneDrive\Documentos\Nova IMS\DV\Project II\Currencies.xlsx", "Pictures",
+pictures = pd.read_excel("Currencies.xlsx", "Pictures",
                          engine='openpyxl')
 
 # # Create First Line Chart
