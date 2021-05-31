@@ -11,6 +11,7 @@ from plotly.subplots import make_subplots
 from plotly import tools
 import plotly.express as px
 from skimage import io
+from datetime import date
 
 currencies = pd.read_excel("Currencies.xlsx", "Currency",
                            engine='openpyxl')
@@ -174,13 +175,13 @@ server = app.server
 
 app.layout = html.Div([
 
-    html.H1(['Crypto Comparison'], style={'text-align':'center'}),
+    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'}),
 
 html.Div([
     html.Div([
-        html.Div([dcc.Graph(id='Image1')],style={'margin-left' : '5%','margin-right' : 'auto' }),
-        html.Div([dcc.Graph(id='Image2')],style={'margin-left' : 'auto','margin-right' : '5%' })
-    ], style={'display' : 'flex'}),
+        html.Div([dcc.Graph(id='Image1')],style={'margin-left' : '5%','margin-right' : 'auto','backgroundColor': 'white' }),
+        html.Div([dcc.Graph(id='Image2')],style={'margin-left' : 'auto','margin-right' : '5%','backgroundColor': 'white' })
+    ], style={'display' : 'flex', 'backgroundColor': 'white'}),
 
       html.Div([
         html.Div([
@@ -188,14 +189,20 @@ html.Div([
                 id='crypto_drop1',
                 options=crypto_list,
                 value = 'ETH',
-                multi=False,)], style={'width': '10%','height' : '30%' ,'margin-left' : '10%','margin-right' : 'auto' }),
+                multi=False,
+                clearable=False,
+                placeholder="Select a Currency")], style={'width': '10%','height' : '30%' ,'margin-left' : '10%','margin-right' : 'auto','font-family':'Verdana' }),
         html.Div([
             dcc.Dropdown(
                 id='crypto_drop2',
                 options=crypto_list,
                 value = 'BTC',
-                multi=False)], style={'width': '10%','height' : '30%' ,'margin-left' : 'auto','margin-right' : '10%' })
-        ], style={'width': "100%", 'display': 'flex'}, className='box')], style={'width': '100%','height' : '20%'}),
+                multi=False,
+                clearable=False,
+                placeholder="Select a Currency")],
+            style={'width': '10%','height' : '30%' ,'margin-left' : 'auto','margin-right' : '10%','font-family':'Verdana' })
+        ], style={'width': "100%", 'display': 'flex'}, className='box')
+], style={'width': '100%','height' : '20%'}),
 
     html.Div([
         dcc.Graph(id='Table1'),
@@ -203,14 +210,46 @@ html.Div([
         dcc.Graph(id='radar_chart'),
 
         dcc.Graph(id='Table2')],
-        style={'width': "100%", 'height':'30%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '3%','margin-bottom' : '0'}, className='box'),
+        style={'width': "100%", 'height':'30%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '3%','margin-bottom' : '0','backgroundColor': 'white'}, className='box'),
 
    # html.Br(),  # paragrafo
+    html.Div([
+     html.Div([
+        html.Label('X - AXIS SETTINGS:'),
+
+        dcc.RadioItems(
+            id='lin_log',
+            options=[dict(label='linear', value='linear'), dict(label='log', value='log')],
+            value='linear'
+        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%'}),
+     html.Div([
+        html.Label('DATA SETTINGS:'),
+
+        dcc.RadioItems(
+            id='daily_change',
+            options=[dict(label='Daily Value', value='Closing Price (USD)'), dict(label='Daily Change', value='Daily Change')],
+            value='Closing Price (USD)'
+        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%'}),
+
+    html.Div([
+        html.Label('DATE RANGE:'),
+        html.Div([
+            dcc.DatePickerRange(
+                id='date_range',
+                min_date_allowed=date(2013, 10, 1),
+                max_date_allowed=date(2021, 5, 29),
+                start_date=date(2018, 10, 1),
+                end_date=date(2021, 5, 29),
+                display_format='MMM Do, YY')], style={'height':'80%'})
+
+        ], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%'})
+
+     ], style={'display':'flex','margin-left' : '5%','margin-right' : '5%'}),
 
     dcc.Graph(id='line_chart')
 
 
-])
+], style={'backgroundColor': 'white'}) #gray color
 
 
 @app.callback(
@@ -225,32 +264,39 @@ html.Div([
     ],
     [
     Input('crypto_drop1', 'value'),
-    Input('crypto_drop2', 'value')
+    Input('crypto_drop2', 'value'),
+    Input("lin_log", "value"),
+    Input("daily_change", "value"),
+    Input("date_range", "start_date"),
+    Input("date_range", "end_date")
     ]
 )
-def update_graph(crypto1, crypto2):
+def update_graph(crypto1, crypto2, lin_log, data_type, picked_start_date, picked_end_date):
     #################### LINE CHART #########################
 
     line_data = []
 
+    prices_dates = prices[(prices["Date"]>= picked_start_date) & (prices["Date"]<= picked_end_date)]
 
-    filtered_currency1 = prices[prices['Currency'] == crypto1]
+    filtered_currency1 = prices_dates[prices_dates['Currency'] == crypto1]
 
     temp_data1 = dict(
         type='scatter',
-        y=filtered_currency1["Closing Price (USD)"],
+        y=filtered_currency1[data_type],
         x=filtered_currency1['Date'],
-        name=crypto1
+        name=crypto1,
+        line=dict(color="#0B3954")
     )
 
 
-    filtered_currency2 = prices[prices['Currency'] == crypto2]
+    filtered_currency2 = prices_dates[prices_dates['Currency'] == crypto2]
 
     temp_data2 = dict(
         type='scatter',
-        y=filtered_currency2["Closing Price (USD)"],
+        y=filtered_currency2[data_type],
         x=filtered_currency2['Date'],
-        name=crypto2
+        name=crypto2,
+        line=dict(color="#9CD3CD")
     )
 
 
@@ -258,10 +304,12 @@ def update_graph(crypto1, crypto2):
 
     line_layout = dict(xaxis=dict(title='Year'),
                        yaxis=dict(title="Closing Price (USD)"),
-                       title = "TEST"
-                          )
+                       title = crypto1 + " vs " + crypto2,
+                       plot_bgcolor='white',
+                       )
 
     fig_line_chart = go.Figure(data=line_data, layout=line_layout)
+    fig_line_chart.update_yaxes(type=lin_log)
 
     #################### RADAR CHART #########################
 
@@ -273,14 +321,16 @@ def update_graph(crypto1, crypto2):
         r=attributes[attributes["Currency"] == crypto1]["Amount"],
         theta=categories,
         fill='toself',
-        name= crypto1
+        name= crypto1,
+        line=dict(color="#0B3954")
     )
 
     radar_data2 = go.Scatterpolar(
         r=attributes[attributes["Currency"] == crypto2]["Amount"],
         theta=categories,
         fill='toself',
-        name=crypto2
+        name=crypto2,
+        line=dict(color="#9CD3CD")
     )
 
     radar_layout = dict(polar=dict(
@@ -299,15 +349,16 @@ def update_graph(crypto1, crypto2):
 
 
     #################### TABLE 1 CHART #########################
-    table1_data = go.Table(header=dict(values=['Description' + " " + crypto2],
-                         line_color='darkslategray',
-                         fill_color='lightskyblue',
+    table1_data = go.Table(header=dict(values=['Description' + " " + crypto1],
+                         line_color='#0B3954',
+                         fill_color='#0B3954',
+                         font=dict(color='white', family="Verdana", size=12),
                          align='left'),
 
                          cells=dict(values=[pros[pros["Currency"]==crypto1]["Description"] # 1st column
                                            ], # 2nd column
-                         line_color='darkslategray',
-                         fill_color='lightcyan',
+                         line_color='#0B3954',
+                         fill_color='#9CD3CD',
                          align='left'))
 
     layout_table1 = dict(width=300, height=400, margin=dict(l=10, r=10, b=10, t=10))
@@ -316,14 +367,15 @@ def update_graph(crypto1, crypto2):
 
     #################### TABLE 2 CHART #########################
     table2_data = go.Table(header=dict(values=['Description' + " " + crypto2],
-                                       line_color='darkslategray',
-                                       fill_color='lightskyblue',
+                                       line_color='#0B3954',
+                                       fill_color='#0B3954',
+                                       font=dict(color='white', family="Verdana", size=12),
                                        align='left'),
 
                            cells=dict(values=[pros[pros["Currency"] == crypto2]["Description"]  # 1st column
                                               ],  # 2nd column
-                                      line_color='darkslategray',
-                                      fill_color='lightcyan',
+                                      line_color='#0B3954',
+                                      fill_color='#9CD3CD',
                                       align='left'))
 
     layout_table2 = dict(width=300, height=400, margin=dict(l=10, r=10, b=10, t=10))
@@ -335,7 +387,7 @@ def update_graph(crypto1, crypto2):
     image1 = px.imshow(img1)
     image1.update_xaxes(showticklabels=False)
     image1.update_yaxes(showticklabels=False)
-    image1.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'rgba(0,0,0,0)')
+    image1.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
 
 
     #################### IMAGE 2 CHART #########################
@@ -343,7 +395,7 @@ def update_graph(crypto1, crypto2):
     image2 = px.imshow(img2)
     image2.update_xaxes(showticklabels=False)
     image2.update_yaxes(showticklabels=False)
-    image2.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'rgba(0,0,0,0)')
+    image2.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
 
 
     return fig_line_chart, \
