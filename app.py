@@ -174,9 +174,10 @@ app = dash.Dash(__name__)
 server = app.server
 
 app.layout = html.Div([
-
+############################################# MAIN TITLE ##############################################
     html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'}),
 
+##################################### CRYPTO SELECTION ################################################
 html.Div([
     html.Div([
         html.Div([dcc.Graph(id='Image1')],style={'margin-left' : '5%','margin-right' : 'auto','backgroundColor': 'white' }),
@@ -211,6 +212,8 @@ html.Div([
 
 ], style={'width': '100%','height' : '20%'}),
 
+######################################## TABLES AND RADAR #############################################
+
     html.Div([
         html.Div([
         dcc.Graph(id='Table1')], style={'width':'25%', 'display': 'flex','margin-left' : '1%','margin-right' : 'auto','font-family':'Verdana' }, className='box'),
@@ -223,35 +226,56 @@ html.Div([
 
         style={'width': "100%", 'height':'20%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '3%','margin-bottom' : '1%','backgroundColor': 'white'}, className='box'),
 
-   # html.Br(),  # paragrafo
+######################################## INVESTMENT ANALYSIS ###########################################
 
+        html.Br(),
+        html.H2(["Investment Analysis"], style={'text-align':'center', 'font-family':'Verdana','margin-top' : '2%','margin-bottom' : '2%'}),
+
+######################################## INVESTMENT VALUES #############################################
         html.Div([
 
             html.Div([
+                dcc.Graph(id='scorecard1')], style={'width':'20%' , 'display': 'flex', 'font-family': 'Verdana','margin-left' : '2%'},
+                className='box'),
 
-            html.Label('Investment Value'),
+            html.Div([
+
+            html.Label(['Investment Value'], style = {'text-align':'center'}),
+            html.Br(),
             html.Br(),
             dcc.Input(
                 id="invest_value".format('number'),
+                value= 1,
                 type='number',
+
                 placeholder="Insert Value to invest".format('number'),
-                style = {'height': 48, 'fontSize': 20}
-            )], style={'height': '100%','margin-left' : '30%','margin-right' : 'auto'}),
+                style = {'height': 40, 'fontSize': 18, 'text-align':'center'}
+            )], style={'width':'25%', 'height': '100%','margin-left' : '2%','margin-right' : '2%', 'text-align':'center'}),
+
+
 
             html.Div([
-            html.Label('Investment Date'),
+            html.Label(['Investment Date'], style = {'text-align':'center'}),
+            html.Br(),
             html.Br(),
             dcc.DatePickerSingle(
                 id='invest_date',
                 min_date_allowed=date(2013, 10, 1),
                 max_date_allowed=date(2021, 5, 29),
                 initial_visible_month=date(2018, 10, 1),
-                date=date(2018, 10, 1)
-            )], style={'height': '100%','margin-left' : 'auto','margin-right' : '30%'})
+                date=date(2019, 10, 1)
+            )], style={'width':'25%' ,'height': '100%','margin-left' : '2%','margin-right' : '2%','text-align':'center'}),
+
+
+            html.Div([
+                dcc.Graph(id='scorecard2')], style={'width':'20%' ,'display': 'flex', 'font-family': 'Verdana','margin-left' : '2%','margin-right' : '1%'},
+                className='box'),
 
     ], style={'display':'flex', 'height':'100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
 
     html.Br(),
+
+######################################## LINE CHART SETTINGS #############################################
 
     html.Div([
      html.Div([
@@ -268,8 +292,8 @@ html.Div([
 
         dcc.RadioItems(
             id='daily_change',
-            options=[dict(label='Daily Value', value='Closing Price (USD)'), dict(label='Daily Change', value='Daily Change (%)')],
-            value='Closing Price (USD)',
+            options=[dict(label='Profit', value='Profit ($)'), dict(label='Daily Change', value='Daily Change (%)'),dict(label='Daily Value', value='Closing Price (USD)')],
+            value='Profit ($)',
             style={'margin-top' : '5%'}
         )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' }),
 
@@ -282,11 +306,13 @@ html.Div([
                 max_date_allowed=date(2021, 5, 29),
                 start_date=date(2018, 10, 1),
                 end_date=date(2021, 5, 29),
-                display_format='MMM Do, YY')], style={'height':'60%','font-family':'Verdana' })
+                display_format='DD, MMM, YY')], style={'height':'60%','font-family':'Verdana' })
 
         ], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' })
 
      ], style={'display':'flex','margin-left' : '15%','margin-right' : '5%'}),
+
+######################################## LINE CHART #############################################
 
     dcc.Graph(id='line_chart')
 
@@ -302,7 +328,10 @@ html.Div([
     Output('Table1', 'figure'),
     Output('Table2', 'figure'),
     Output('Image1', 'figure'),
-    Output('Image2', 'figure')
+    Output('Image2', 'figure'),
+    Output('scorecard1', 'figure'),
+    Output('scorecard2', 'figure')
+
     ],
     [
     Input('crypto_drop1', 'value'),
@@ -316,7 +345,26 @@ html.Div([
     ]
 )
 def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, picked_start_date, picked_end_date):
-    #################### LINE CHART #########################
+
+    ######################################## AUX COLUMNS FOR PROFIT #############################################
+
+    cryptoprice_1 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
+
+    cryptonumber_1 = invest_value / cryptoprice_1
+
+    cryptoprice_2 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
+
+    cryptonumber_2 = invest_value / cryptoprice_2
+
+    prices["Profit 1"] = prices[prices["Currency"] == crypto1]["Closing Price (USD)"].apply(lambda line: line * cryptonumber_1)
+    prices["Profit 2"] = prices[prices["Currency"] == crypto2]["Closing Price (USD)"].apply(lambda line: line * cryptonumber_2)
+
+    prices["Profit 1"] = prices["Profit 1"].fillna(0)
+    prices["Profit 2"] = prices["Profit 2"].fillna(0)
+
+    prices["Profit ($)"] = prices["Profit 1"] + prices["Profit 2"]
+
+    ######################################## LINE CHART #############################################
 
     line_data = []
 
@@ -346,16 +394,16 @@ def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, 
 
     line_data = [temp_data1, temp_data2]
 
-    line_layout = dict(xaxis=dict(title='Year'),
+    line_layout = dict(xaxis=dict(title='Date'),
                        yaxis=dict(title= data_type + "(" + lin_log + ")" ),
-                       title = crypto1 + " vs " + crypto2,
+                       title = data_type + " for " + list(currencies[currencies["Currency"]==crypto1]["Name"])[0] + " vs " + list(currencies[currencies["Currency"]==crypto2]["Name"])[0],
                        plot_bgcolor='white',
                        )
 
     fig_line_chart = go.Figure(data=line_data, layout=line_layout)
     fig_line_chart.update_yaxes(type=lin_log)
 
-    #################### RADAR CHART #########################
+    ######################################## RADAR CHART ##################################################
 
     radar_data = []
 
@@ -441,13 +489,48 @@ def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, 
     image2.update_yaxes(showticklabels=False)
     image2.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
 
+    #################### SCORECARD 1 CHART #########################
+    cryptoprice1 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
+
+    cryptonumber1 = invest_value / cryptoprice1
+
+    crypto_lastprice1 = list(prices[(prices["Date"] == '26/05/2021') & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
+
+    profit1 = (cryptonumber1 * crypto_lastprice1) - (cryptonumber1 * cryptoprice1)
+
+    scorecard1 = go.Figure(go.Indicator(
+        mode="number+delta",
+        value=round(float(profit1), 2),
+        number={'prefix': "$"},
+        delta={'position': "bottom", 'reference': invest_value, 'relative' :True},
+    ))
+    scorecard1.update_layout(width=200, height=100, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor='rgba(0,0,0,0)')
+
+    #################### SCORECARD 2 CHART #########################
+    cryptoprice2 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
+
+    cryptonumber2 = invest_value / cryptoprice2
+
+    crypto_lastprice2 = list(prices[(prices["Date"] == '26/05/2021') & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
+
+    profit2 = (cryptonumber2 * crypto_lastprice2) - (cryptonumber2 * cryptoprice2)
+
+    scorecard2 = go.Figure(go.Indicator(
+        mode="number+delta",
+        value=round(float(profit2), 2),
+        number={'prefix': "$"},
+        delta={'position': "bottom", 'reference': invest_value, 'relative' :True},
+    ))
+    scorecard2.update_layout(width=200, height=100, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor='rgba(0,0,0,0)')
 
     return fig_line_chart, \
            fig_radar_chart, \
            table1, \
            table2, \
            image1, \
-           image2
+           image2, \
+           scorecard1, \
+           scorecard2
 
 
 if __name__ == '__main__':
