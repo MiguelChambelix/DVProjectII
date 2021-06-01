@@ -180,10 +180,11 @@ app.layout = html.Div([
 html.Div([
     html.Div([
         html.Div([dcc.Graph(id='Image1')],style={'margin-left' : '5%','margin-right' : 'auto','backgroundColor': 'white' }),
-        html.Div([dcc.Graph(id='Image2')],style={'margin-left' : 'auto','margin-right' : '5%','backgroundColor': 'white' })
-    ], style={'display' : 'flex', 'backgroundColor': 'white'}),
 
-      html.Div([
+        html.Div([
+        html.H2(["Select the Currencies to compare"], style={'text-align':'center', 'font-family':'Verdana','margin-top' : '10%','margin-bottom' : '15%'}),
+
+        html.Div([
         html.Div([
             dcc.Dropdown(
                 id='crypto_drop1',
@@ -191,7 +192,7 @@ html.Div([
                 value = 'ETH',
                 multi=False,
                 clearable=False,
-                placeholder="Select a Currency")], style={'width': '10%','height' : '30%' ,'margin-left' : '10%','margin-right' : 'auto','font-family':'Verdana' }),
+                placeholder="Select a Currency")], style={'width': '30%','height' : '30%' ,'margin-left' : '10%','margin-right' : 'auto','font-family':'Verdana' }),
         html.Div([
             dcc.Dropdown(
                 id='crypto_drop2',
@@ -200,36 +201,77 @@ html.Div([
                 multi=False,
                 clearable=False,
                 placeholder="Select a Currency")],
-            style={'width': '10%','height' : '30%' ,'margin-left' : 'auto','margin-right' : '10%','font-family':'Verdana' })
-        ], style={'width': "100%", 'display': 'flex'}, className='box')
+            style={'width': '30%','height' : '30%' ,'margin-left' : 'auto','margin-right' : '10%','font-family':'Verdana' })
+        ], style={'width': "100%", 'display': 'flex'}, className='box')]),
+
+
+        html.Div([dcc.Graph(id='Image2')],style={'margin-left' : 'auto','margin-right' : '5%','backgroundColor': 'white' })
+    ], style={'display' : 'flex', 'backgroundColor': 'white'}),
+
+
 ], style={'width': '100%','height' : '20%'}),
 
     html.Div([
-        dcc.Graph(id='Table1'),
+        html.Div([
+        dcc.Graph(id='Table1')], style={'width':'25%', 'display': 'flex','margin-left' : '1%','margin-right' : 'auto','font-family':'Verdana' }, className='box'),
 
-        dcc.Graph(id='radar_chart'),
+        html.Div([
+        dcc.Graph(id='radar_chart')], style={'width':'50%', 'display': 'flex','font-family':'Verdana' }, className='box'),
 
-        dcc.Graph(id='Table2')],
-        style={'width': "100%", 'height':'30%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '3%','margin-bottom' : '0','backgroundColor': 'white'}, className='box'),
+        html.Div([
+        dcc.Graph(id='Table2')], style={'width':'25%', 'display': 'flex','margin-left' : 'auto','margin-right' : '5%','font-family':'Verdana' }, className='box')],
+
+        style={'width': "100%", 'height':'20%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '3%','margin-bottom' : '1%','backgroundColor': 'white'}, className='box'),
 
    # html.Br(),  # paragrafo
+
+        html.Div([
+
+            html.Div([
+
+            html.Label('Investment Value'),
+            html.Br(),
+            dcc.Input(
+                id="invest_value".format('number'),
+                type='number',
+                placeholder="Insert Value to invest".format('number'),
+                style = {'height': 48, 'fontSize': 20}
+            )], style={'height': '100%','margin-left' : '30%','margin-right' : 'auto'}),
+
+            html.Div([
+            html.Label('Investment Date'),
+            html.Br(),
+            dcc.DatePickerSingle(
+                id='invest_date',
+                min_date_allowed=date(2013, 10, 1),
+                max_date_allowed=date(2021, 5, 29),
+                initial_visible_month=date(2018, 10, 1),
+                date=date(2018, 10, 1)
+            )], style={'height': '100%','margin-left' : 'auto','margin-right' : '30%'})
+
+    ], style={'display':'flex', 'height':'100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
+
+    html.Br(),
+
     html.Div([
      html.Div([
         html.Label('X - AXIS SETTINGS:'),
 
         dcc.RadioItems(
             id='lin_log',
-            options=[dict(label='linear', value='linear'), dict(label='log', value='log')],
-            value='linear'
-        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%'}),
+            options=[dict(label='LINEAR', value='linear'), dict(label='LOG', value='log')],
+            value='linear',
+            style={'margin-top' : '5%'}
+        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' }),
      html.Div([
         html.Label('DATA SETTINGS:'),
 
         dcc.RadioItems(
             id='daily_change',
-            options=[dict(label='Daily Value', value='Closing Price (USD)'), dict(label='Daily Change', value='Daily Change')],
-            value='Closing Price (USD)'
-        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%'}),
+            options=[dict(label='Daily Value', value='Closing Price (USD)'), dict(label='Daily Change', value='Daily Change (%)')],
+            value='Closing Price (USD)',
+            style={'margin-top' : '5%'}
+        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' }),
 
     html.Div([
         html.Label('DATE RANGE:'),
@@ -240,11 +282,11 @@ html.Div([
                 max_date_allowed=date(2021, 5, 29),
                 start_date=date(2018, 10, 1),
                 end_date=date(2021, 5, 29),
-                display_format='MMM Do, YY')], style={'height':'80%'})
+                display_format='MMM Do, YY')], style={'height':'60%','font-family':'Verdana' })
 
-        ], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%'})
+        ], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' })
 
-     ], style={'display':'flex','margin-left' : '5%','margin-right' : '5%'}),
+     ], style={'display':'flex','margin-left' : '15%','margin-right' : '5%'}),
 
     dcc.Graph(id='line_chart')
 
@@ -265,13 +307,15 @@ html.Div([
     [
     Input('crypto_drop1', 'value'),
     Input('crypto_drop2', 'value'),
+    Input('invest_value', 'value'),
+    Input('invest_date', 'date'),
     Input("lin_log", "value"),
     Input("daily_change", "value"),
     Input("date_range", "start_date"),
     Input("date_range", "end_date")
     ]
 )
-def update_graph(crypto1, crypto2, lin_log, data_type, picked_start_date, picked_end_date):
+def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, picked_start_date, picked_end_date):
     #################### LINE CHART #########################
 
     line_data = []
@@ -303,7 +347,7 @@ def update_graph(crypto1, crypto2, lin_log, data_type, picked_start_date, picked
     line_data = [temp_data1, temp_data2]
 
     line_layout = dict(xaxis=dict(title='Year'),
-                       yaxis=dict(title="Closing Price (USD)"),
+                       yaxis=dict(title= data_type + "(" + lin_log + ")" ),
                        title = crypto1 + " vs " + crypto2,
                        plot_bgcolor='white',
                        )
@@ -340,7 +384,7 @@ def update_graph(crypto1, crypto2, lin_log, data_type, picked_start_date, picked
 
         )),
         showlegend=False,
-        margin=dict(l=0, r=10, b=10, t=0)
+        margin=dict(l=10, r=10, b=10, t=10)
     )
 
     radar_data = [radar_data1, radar_data2]
@@ -361,7 +405,7 @@ def update_graph(crypto1, crypto2, lin_log, data_type, picked_start_date, picked
                          fill_color='#9CD3CD',
                          align='left'))
 
-    layout_table1 = dict(width=300, height=400, margin=dict(l=10, r=10, b=10, t=10))
+    layout_table1 = dict(width = 300, margin=dict(l=10, r=10, b=10, t=10))
 
     table1 = go.Figure(data=table1_data, layout = layout_table1)
 
@@ -378,7 +422,7 @@ def update_graph(crypto1, crypto2, lin_log, data_type, picked_start_date, picked
                                       fill_color='#9CD3CD',
                                       align='left'))
 
-    layout_table2 = dict(width=300, height=400, margin=dict(l=10, r=10, b=10, t=10))
+    layout_table2 = dict(width = 300, margin=dict(l=10, r=10, b=10, t=10))
 
     table2 = go.Figure(data=table2_data, layout=layout_table2)
 
