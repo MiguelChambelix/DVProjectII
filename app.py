@@ -14,6 +14,7 @@ from skimage import io
 from datetime import date
 from datetime import datetime
 
+
 currencies = pd.read_excel("Currencies.xlsx", "Currency",
                            engine='openpyxl')
 prices = pd.read_excel("Currencies.xlsx", "Prices",
@@ -176,8 +177,9 @@ server = app.server
 
 app.layout = html.Div([
 ############################################# MAIN TITLE ##############################################
-    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white', 'height':40}),
-
+    html.Div([
+    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'padding' : 20, 'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'})
+    ]),
 ##################################### CRYPTO SELECTION ################################################
 html.Div([
     html.Div([
@@ -255,7 +257,9 @@ html.Div([
                 style = {'height': 40, 'fontSize': 18, 'text-align':'center'}
             )], style={'width':'25%', 'height': '100%','margin-left' : '2%','margin-right' : '2%', 'text-align':'center'}),
 
-            html.Button('CALCULATE', id='submit-val', n_clicks=0, style = {'width':100,'height': 40, 'margin-top' : '2%', 'backgroundColor':"white", 'font-family': 'Verdana',':hover': {'backgroundColor': 'black'}}),
+            html.Button('CALCULATE', id='submit-val', n_clicks=0, style = {'width':100,'height': 40, 'margin-top' : '2%',
+                                                                           'font-family': 'Verdana'}),
+
 
             html.Div([
             html.Label(['Investment Date'], style = {'text-align':'center'}),
@@ -267,14 +271,8 @@ html.Div([
                 id='invest_date',
                 type='text',
                 value='2021-01-01',
-                style={'height': 40, 'fontSize': 18, 'text-align':'center'}
+                style={'height': 40, 'fontSize': 18, 'text-align':'center'},
 
-            # dcc.DatePickerSingle(
-            #     id='invest_date',
-            #     min_date_allowed=date(2013, 10, 1),
-            #     max_date_allowed=date(2021, 5, 29),
-            #     initial_visible_month=date(2020, 10, 1),
-            #     date=date(2019, 10, 1)
 
             )], style={'width':'25%' ,'height': '100%','margin-left' : '2%','margin-right' : '2%','text-align':'center'}),
 
@@ -440,8 +438,14 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
     fig_line_chart.update_xaxes(ticklabelmode="period", dtick="M1", tickformat="%b\n%Y")
     fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto1, x=max_date_crypto1, text=("Max "+ data_type + " for " + crypto1 + " : " + str(round(max_crypto1,2))) ,showarrow=True,arrowhead=1)
     fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto2, x=max_date_crypto2, text=("Max "+ data_type + " for " + crypto2+ " : " + str(round(max_crypto2,2))), showarrow=True,arrowhead=1)
-    fig_line_chart.add_shape(type="line", x0=invest_date, y0=0, x1=invest_date, y1=max_crypto,line=dict(color="red", width=2,dash="dot"))
-    fig_line_chart.add_trace(go.Scatter(name="Investment Date",x=[invest_date],y=[max_crypto], marker=dict(color=["red"]),mode='markers')),
+
+    if lin_log == "linear":
+        fig_line_chart.add_shape(type="line", x0=invest_date, y0=0, x1=invest_date, y1=max_crypto,
+                                 line=dict(color="red", width=2, dash="dot"))
+        fig_line_chart.add_trace(go.Scatter(name="Investment Date",x=[invest_date],y=[max_crypto], marker=dict(color=["red"]),mode='markers'))
+
+    else:
+        pass
     ######################################## RADAR CHART ##################################################
 
     radar_data = []
@@ -453,7 +457,8 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         theta=categories,
         fill='toself',
         name= crypto1,
-        line=dict(color="#0B3954")
+        line=dict(color="#0B3954"),
+        text= attributes[attributes["Currency"] == crypto1]["Description"]
     )
 
     radar_data2 = go.Scatterpolar(
@@ -461,7 +466,8 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         theta=categories,
         fill='toself',
         name=crypto2,
-        line=dict(color="#9CD3CD")
+        line=dict(color="#9CD3CD"),
+        text= attributes[attributes["Currency"] == crypto2]["Description"]
     )
 
     radar_layout = dict(polar=dict(
@@ -471,13 +477,17 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
 
         )),
         showlegend=True,
-        margin=dict(l=10, r=10, b=10, t=10),
+        margin=dict(l=10, r=10, b=10, t=30),
+        #title = crypto1 + " vs " + crypto2 + " Main Stats"
 
     )
 
     radar_data = [radar_data1, radar_data2]
 
-    fig_radar_chart = go.Figure(data=radar_data, layout=radar_layout)
+    fig_radar_chart = go.Figure(data=radar_data, layout=radar_layout )
+    fig_radar_chart.update_annotations(width = 40)
+    fig_radar_chart.update_layout(legend=dict(yanchor="top", y=1, xanchor="right", x=0.85, orientation="v"))
+    #fig_radar_chart.update_layout(title={'y': 0.99,'x': 0.2,'xanchor': 'center','yanchor': 'top'})
 
 
     #################### TABLE 1 CHART #########################
@@ -519,7 +529,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
     image1 = px.imshow(img1)
     image1.update_xaxes(showticklabels=False)
     image1.update_yaxes(showticklabels=False)
-    image1.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
+    image1.update_layout(width=200, height=200, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
 
 
     #################### IMAGE 2 CHART #########################
@@ -527,7 +537,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
     image2 = px.imshow(img2)
     image2.update_xaxes(showticklabels=False)
     image2.update_yaxes(showticklabels=False)
-    image2.update_layout(width=300, height=300, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
+    image2.update_layout(width=200, height=200, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
 
     #################### SCORECARD 1 CHART #########################
     cryptoprice1 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
