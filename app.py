@@ -4,7 +4,7 @@ import numpy as np
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
@@ -12,6 +12,7 @@ from plotly import tools
 import plotly.express as px
 from skimage import io
 from datetime import date
+from datetime import datetime
 
 currencies = pd.read_excel("Currencies.xlsx", "Currency",
                            engine='openpyxl')
@@ -175,7 +176,7 @@ server = app.server
 
 app.layout = html.Div([
 ############################################# MAIN TITLE ##############################################
-    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'}),
+    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white', 'height':40}),
 
 ##################################### CRYPTO SELECTION ################################################
 html.Div([
@@ -242,6 +243,8 @@ html.Div([
 
             html.Label(['Investment Value'], style = {'text-align':'center'}),
             html.Br(),
+            html.Label(['USD ($)'], style={'text-align': 'center', 'fontSize': 10}),
+            html.Br(),
             html.Br(),
             dcc.Input(
                 id="invest_value".format('number'),
@@ -252,18 +255,27 @@ html.Div([
                 style = {'height': 40, 'fontSize': 18, 'text-align':'center'}
             )], style={'width':'25%', 'height': '100%','margin-left' : '2%','margin-right' : '2%', 'text-align':'center'}),
 
-
+            html.Button('CALCULATE', id='submit-val', n_clicks=0, style = {'width':100,'height': 40, 'margin-top' : '2%', 'backgroundColor':"white", 'font-family': 'Verdana',':hover': {'backgroundColor': 'black'}}),
 
             html.Div([
             html.Label(['Investment Date'], style = {'text-align':'center'}),
             html.Br(),
+            html.Label(['(YYYY-MM-DD)'], style = {'text-align':'center','fontSize': 10}),
             html.Br(),
-            dcc.DatePickerSingle(
+            html.Br(),
+            dcc.Input(
                 id='invest_date',
-                min_date_allowed=date(2013, 10, 1),
-                max_date_allowed=date(2021, 5, 29),
-                initial_visible_month=date(2018, 10, 1),
-                date=date(2019, 10, 1)
+                type='text',
+                value='2021-01-01',
+                style={'height': 40, 'fontSize': 18, 'text-align':'center'}
+
+            # dcc.DatePickerSingle(
+            #     id='invest_date',
+            #     min_date_allowed=date(2013, 10, 1),
+            #     max_date_allowed=date(2021, 5, 29),
+            #     initial_visible_month=date(2020, 10, 1),
+            #     date=date(2019, 10, 1)
+
             )], style={'width':'25%' ,'height': '100%','margin-left' : '2%','margin-right' : '2%','text-align':'center'}),
 
 
@@ -279,36 +291,40 @@ html.Div([
 
     html.Div([
      html.Div([
-        html.Label('X - AXIS SETTINGS:'),
+        html.Label('X - AXIS SETTINGS'),
 
         dcc.RadioItems(
             id='lin_log',
             options=[dict(label='LINEAR', value='linear'), dict(label='LOG', value='log')],
             value='linear',
-            style={'margin-top' : '5%'}
-        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' }),
+            style={'margin-top' : '5%','height':40}
+        )], style={'text-align':'center','height': '100%', 'width':'20%','margin-left' : '1%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' }),
+
+
      html.Div([
-        html.Label('DATA SETTINGS:'),
+        html.Label('DATA SETTINGS'),
 
         dcc.RadioItems(
             id='daily_change',
             options=[dict(label='Profit', value='Profit ($)'), dict(label='Daily Change', value='Daily Change (%)'),dict(label='Daily Value', value='Closing Price (USD)')],
             value='Profit ($)',
-            style={'margin-top' : '5%'}
-        )], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' }),
+            style={'margin-top' : '5%','height':40}
+        )], style={'text-align':'center','height': '100%', 'width':'30%','margin-left' : '1%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
 
     html.Div([
-        html.Label('DATE RANGE:'),
+        html.Label('DATE RANGE'),
         html.Div([
-            dcc.DatePickerRange(
-                id='date_range',
-                min_date_allowed=date(2013, 10, 1),
-                max_date_allowed=date(2021, 5, 29),
-                start_date=date(2018, 10, 1),
-                end_date=date(2021, 5, 29),
-                display_format='DD, MMM, YY')], style={'height':'60%','font-family':'Verdana' })
 
-        ], style={'height': '100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' })
+            dcc.RangeSlider(
+                id='date_range',
+                marks={i: '{}'.format(i) for i in range(2014, 2022)},
+                min=2014,
+                max=2021,
+                #type = 'value',
+                value=[2020, 2021]
+            )], style={'height':40,'font-family':'Verdana','padding':'2%' })
+
+        ], style={'text-align':'center','height': '100%', 'width':'30%','margin-left' : '1%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana' })
 
      ], style={'display':'flex','margin-left' : '15%','margin-right' : '5%'}),
 
@@ -336,15 +352,26 @@ html.Div([
     [
     Input('crypto_drop1', 'value'),
     Input('crypto_drop2', 'value'),
-    Input('invest_value', 'value'),
-    Input('invest_date', 'date'),
+    Input('submit-val', 'n_clicks'),
     Input("lin_log", "value"),
     Input("daily_change", "value"),
-    Input("date_range", "start_date"),
-    Input("date_range", "end_date")
+    Input("date_range", "value"),
+    #Input("date_range", "end_date")
+    ],
+    [
+    State('invest_value', 'value'),
+    State('invest_date', 'value')
     ]
 )
-def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, picked_start_date, picked_end_date):
+def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_value, invest_date):#, picked_end_date):
+
+    invest_date = datetime.strptime(invest_date, '%Y-%m-%d')
+
+    picked_start_date = pd.to_datetime(str(picked_date[0])+"-01-01")  #date(2014,1,1)#date(picked_date[0],1,1)
+    if str(picked_date[1]) == '2021':
+        picked_end_date = pd.to_datetime(str(picked_date[1]) + "-05-26")
+    else:
+        picked_end_date = pd.to_datetime(str(picked_date[1])+"-12-01") #date(picked_date[1],12,31)
 
     ######################################## AUX COLUMNS FOR PROFIT #############################################
 
@@ -379,7 +406,9 @@ def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, 
         name=crypto1,
         line=dict(color="#0B3954")
     )
+    max_crypto1 = max(prices_dates[prices_dates["Currency"]==crypto1][data_type])
 
+    max_date_crypto1 = list(prices_dates[(prices_dates["Currency"] == crypto1) & (prices_dates[data_type] == max_crypto1)]["Date"])[0]
 
     filtered_currency2 = prices_dates[prices_dates['Currency'] == crypto2]
 
@@ -390,7 +419,11 @@ def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, 
         name=crypto2,
         line=dict(color="#9CD3CD")
     )
+    max_crypto2 = max(prices_dates[prices_dates["Currency"]==crypto2][data_type])
 
+    max_date_crypto2 = list(prices_dates[(prices_dates["Currency"] == crypto2) & (prices_dates[data_type] == max_crypto2)]["Date"])[0]
+
+    max_crypto = max([max_crypto1, max_crypto2])
 
     line_data = [temp_data1, temp_data2]
 
@@ -402,7 +435,13 @@ def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, 
 
     fig_line_chart = go.Figure(data=line_data, layout=line_layout)
     fig_line_chart.update_yaxes(type=lin_log)
-
+    fig_line_chart.update_layout(hovermode="x")
+    fig_line_chart.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="left",  x=0.01))
+    fig_line_chart.update_xaxes(ticklabelmode="period", dtick="M1", tickformat="%b\n%Y")
+    fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto1, x=max_date_crypto1, text=("Max "+ data_type + " for " + crypto1 + " : " + str(round(max_crypto1,2))) ,showarrow=True,arrowhead=1)
+    fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto2, x=max_date_crypto2, text=("Max "+ data_type + " for " + crypto2+ " : " + str(round(max_crypto2,2))), showarrow=True,arrowhead=1)
+    fig_line_chart.add_shape(type="line", x0=invest_date, y0=0, x1=invest_date, y1=max_crypto,line=dict(color="red", width=2,dash="dot"))
+    fig_line_chart.add_trace(go.Scatter(name="Investment Date",x=[invest_date],y=[max_crypto], marker=dict(color=["red"]),mode='markers')),
     ######################################## RADAR CHART ##################################################
 
     radar_data = []
@@ -427,12 +466,13 @@ def update_graph(crypto1, crypto2,invest_value, invest_date,lin_log, data_type, 
 
     radar_layout = dict(polar=dict(
         radialaxis=dict(
-            visible=False,
+            visible=True,
             range=[0, 100]
 
         )),
-        showlegend=False,
-        margin=dict(l=10, r=10, b=10, t=10)
+        showlegend=True,
+        margin=dict(l=10, r=10, b=10, t=10),
+
     )
 
     radar_data = [radar_data1, radar_data2]
