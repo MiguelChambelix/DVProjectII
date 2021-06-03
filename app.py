@@ -570,7 +570,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
 
     crypto_lastprice1 = list(prices[(prices["Date"] == '26/05/2021') & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
 
-    profit1 = (cryptonumber1 * crypto_lastprice1) - (cryptonumber1 * cryptoprice1)
+    profit1 = (cryptonumber1 * crypto_lastprice1)
 
     scorecard1 = go.Figure(go.Indicator(
         mode="number+delta",
@@ -592,7 +592,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
 
     crypto_lastprice2 = list(prices[(prices["Date"] == '26/05/2021') & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
 
-    profit2 = (cryptonumber2 * crypto_lastprice2) - (cryptonumber2 * cryptoprice2)
+    profit2 = (cryptonumber2 * crypto_lastprice2)
 
     scorecard2 = go.Figure(go.Indicator(
         mode="number+delta",
