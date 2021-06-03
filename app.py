@@ -178,7 +178,21 @@ server = app.server
 app.layout = html.Div([
 ############################################# MAIN TITLE ##############################################
     html.Div([
-    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'padding' : 20, 'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'})
+    html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'width': '100%','padding' : 20, 'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'}),
+    html.Button('?', title = "This Dashboard was created with the purpose \n"
+                             "of comparing the hot topic regarding\n"
+                             "Cryptocurrencies and the main differences\n"
+                             "between them.\n"
+                             "\n"
+                             "The First section will help you understand\n"
+                             "the difference between the chosen currencies.\n"
+                             "\n"
+                             "The Second section tells you the story of \n"
+                             "investing in the cryptocurrency market and\n"
+                             "the possible profit that could have been made.\n",
+
+                id='info', n_clicks=0, style = {'width':'2%','margin-top' : '0.5%','margin-left' : '2%','margin-right' : 'auto',
+                                                                           'font-family': 'Verdana','backgroundColor': '#0B3954', 'color': 'white'})
     ]),
 ##################################### CRYPTO SELECTION ################################################
 html.Div([
@@ -328,7 +342,17 @@ html.Div([
 
 ######################################## LINE CHART #############################################
 
-    dcc.Graph(id='line_chart')
+    dcc.Graph(id='line_chart'),
+
+    html.Button('ABOUT THIS DASH', title = "This Dashboard was created by:\n"
+                                           "Akvilina Akstinaite, m20200291\n"
+                                           "Miguel Chambel, m20200326\n"
+                                           "\n"
+                                           "Sources: \n"
+                                           "https://www.ig.com/en/cryptocurrency-trading/cryptocurrency-comparison \n"
+                                           "https://coinmarketcap.com/",
+                id='about', n_clicks=0, style = {'width':200,'height': 40, 'margin-top' : '2%','margin-left' : '5%','margin-right' : 'auto',
+                                                                           'font-family': 'Verdana'})
 
 
 ], style={'backgroundColor': 'white'}) #gray color
