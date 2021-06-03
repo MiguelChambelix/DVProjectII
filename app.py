@@ -209,7 +209,7 @@ html.Div([
         ], style={'width': "100%", 'display': 'flex'}, className='box')]),
 
 
-        html.Div([dcc.Graph(id='Image2')],style={'margin-left' : 'auto','margin-right' : '5%','backgroundColor': 'white' })
+        html.Div([dcc.Graph(id='Image2')],style={'margin-left' : 'auto','margin-right' : '10%','backgroundColor': 'white' })
     ], style={'display' : 'flex', 'backgroundColor': 'white'}),
 
 
@@ -554,7 +554,12 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         number={'prefix': "$"},
         delta={'position': "bottom", 'reference': invest_value, 'relative' :True},
     ))
-    scorecard1.update_layout(width=200, height=100, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor='rgba(0,0,0,0)')
+    scorecard1.update_layout(title = {
+        'text': crypto1,
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'}, width=200, height=100, margin=dict(l=10, r=10, b=10, t=30), plot_bgcolor='rgba(0,0,0,0)')
 
     #################### SCORECARD 2 CHART #########################
     cryptoprice2 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
@@ -571,7 +576,12 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         number={'prefix': "$"},
         delta={'position': "bottom", 'reference': invest_value, 'relative' :True},
     ))
-    scorecard2.update_layout(width=200, height=100, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor='rgba(0,0,0,0)')
+    scorecard2.update_layout(title = {
+        'text': crypto2,
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'},width=200, height=100, margin=dict(l=10, r=10, b=10, t=30), plot_bgcolor='rgba(0,0,0,0)')
 
     return fig_line_chart, \
            fig_radar_chart, \
