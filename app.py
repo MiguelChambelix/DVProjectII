@@ -297,7 +297,7 @@ html.Div([
 
     ], style={'display':'flex', 'height':'100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
 
-    dcc.ConfirmDialog(id='confirm', displayed =False, message = "Investment Date is before Currency starting date. \nPlease select a new date for more accurante data."),
+    dcc.ConfirmDialog(id='confirm', displayed =False, message = "Investment Date is before Currency starting date. \nPlease select a new date for more accurate data."),
 
     html.Br(),
 
@@ -623,7 +623,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         'xanchor': 'center',
         'yanchor': 'top'},width=200, height=100, margin=dict(l=10, r=10, b=10, t=30), plot_bgcolor='rgba(0,0,0,0)')
 
-    if invest_date < crypto1_firstdate:
+    if (invest_date < crypto1_firstdate) or (invest_date < crypto2_firstdate):
         confirm_answer = True
     else:
         confirm_answer =  False
