@@ -297,6 +297,8 @@ html.Div([
 
     ], style={'display':'flex', 'height':'100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
 
+    dcc.ConfirmDialog(id='confirm', displayed =False, message = "Investment Date is before Currency starting date. \nPlease select a new date for more accurante data."),
+
     html.Br(),
 
 ######################################## LINE CHART SETTINGS #############################################
@@ -368,7 +370,8 @@ html.Div([
     Output('Image1', 'figure'),
     Output('Image2', 'figure'),
     Output('scorecard1', 'figure'),
-    Output('scorecard2', 'figure')
+    Output('scorecard2', 'figure'),
+    Output('confirm', 'displayed')
 
     ],
     [
@@ -385,7 +388,7 @@ html.Div([
     State('invest_date', 'value')
     ]
 )
-def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_value, invest_date):#, picked_end_date):
+def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_value, invest_date):
 
     invest_date = datetime.strptime(invest_date, '%Y-%m-%d')
 
@@ -397,14 +400,29 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
 
     ######################################## AUX COLUMNS FOR PROFIT #############################################
 
-    cryptoprice_1 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
+    ## checks if the invest date happens after the data available for the currency
+    crypto1_firstdate = list(prices[(prices["Currency"] == crypto1)]["Date"])[0]
+
+    if crypto1_firstdate > invest_date:
+        cryptoprice_1 = list(prices[(prices["Date"] == crypto1_firstdate) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
+    else:
+        cryptoprice_1 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
 
     cryptonumber_1 = invest_value / cryptoprice_1
 
-    cryptoprice_2 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
+    ## checks if the invest date happens after the data available for the currency
+    crypto2_firstdate = list(prices[(prices["Currency"] == crypto2)]["Date"])[0]
+
+    if crypto2_firstdate > invest_date:
+        cryptoprice_2 = list(prices[(prices["Date"] == crypto2_firstdate) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
+    else:
+        cryptoprice_2 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
 
     cryptonumber_2 = invest_value / cryptoprice_2
 
+
+
+    #calculates profit
     prices["Profit 1"] = prices[prices["Currency"] == crypto1]["Closing Price (USD)"].apply(lambda line: line * cryptonumber_1)
     prices["Profit 2"] = prices[prices["Currency"] == crypto2]["Closing Price (USD)"].apply(lambda line: line * cryptonumber_2)
 
@@ -416,8 +434,10 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
     ######################################## LINE CHART #############################################
 
     line_data = []
-
-    prices_dates = prices[(prices["Date"]>= picked_start_date) & (prices["Date"]<= picked_end_date)]
+    if invest_date < picked_start_date:
+        prices_dates = prices[(prices["Date"] >= invest_date) & (prices["Date"] <= picked_end_date)]
+    else:
+        prices_dates = prices[(prices["Date"]>= picked_start_date) & (prices["Date"]<= picked_end_date)]
 
     filtered_currency1 = prices_dates[prices_dates['Currency'] == crypto1]
 
@@ -460,10 +480,10 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
     fig_line_chart.update_layout(hovermode="x")
     fig_line_chart.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="left",  x=0.01))
     fig_line_chart.update_xaxes(ticklabelmode="period", dtick="M1", tickformat="%b\n%Y")
-    fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto1, x=max_date_crypto1, text=("Max "+ data_type + " for " + crypto1 + " : " + str(round(max_crypto1,2))) ,showarrow=True,arrowhead=1)
-    fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto2, x=max_date_crypto2, text=("Max "+ data_type + " for " + crypto2+ " : " + str(round(max_crypto2,2))), showarrow=True,arrowhead=1)
 
     if lin_log == "linear":
+        fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto1, x=max_date_crypto1, text=("Max "+ data_type + " for " + crypto1 + " : " + str(round(max_crypto1,2))) ,showarrow=True,arrowhead=1)
+        fig_line_chart.add_annotation(bgcolor="#F5F3F6", opacity=0.95, y=max_crypto2, x=max_date_crypto2, text=("Max "+ data_type + " for " + crypto2+ " : " + str(round(max_crypto2,2))), showarrow=True,arrowhead=1)
         fig_line_chart.add_shape(type="line", x0=invest_date, y0=0, x1=invest_date, y1=max_crypto,
                                  line=dict(color="red", width=2, dash="dot"))
         fig_line_chart.add_trace(go.Scatter(name="Investment Date",x=[invest_date],y=[max_crypto], marker=dict(color=["red"]),mode='markers'))
@@ -564,9 +584,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
     image2.update_layout(width=200, height=200, margin=dict(l=10, r=10, b=10, t=10), plot_bgcolor = 'white')
 
     #################### SCORECARD 1 CHART #########################
-    cryptoprice1 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
-
-    cryptonumber1 = invest_value / cryptoprice1
+    cryptonumber1 = invest_value / cryptoprice_1
 
     crypto_lastprice1 = list(prices[(prices["Date"] == '26/05/2021') & (prices["Currency"] == crypto1)]["Closing Price (USD)"])[0]
 
@@ -586,9 +604,7 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         'yanchor': 'top'}, width=200, height=100, margin=dict(l=10, r=10, b=10, t=30), plot_bgcolor='rgba(0,0,0,0)')
 
     #################### SCORECARD 2 CHART #########################
-    cryptoprice2 = list(prices[(prices["Date"] == invest_date) & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
-
-    cryptonumber2 = invest_value / cryptoprice2
+    cryptonumber2 = invest_value / cryptoprice_2
 
     crypto_lastprice2 = list(prices[(prices["Date"] == '26/05/2021') & (prices["Currency"] == crypto2)]["Closing Price (USD)"])[0]
 
@@ -607,6 +623,11 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
         'xanchor': 'center',
         'yanchor': 'top'},width=200, height=100, margin=dict(l=10, r=10, b=10, t=30), plot_bgcolor='rgba(0,0,0,0)')
 
+    if invest_date < crypto1_firstdate:
+        confirm_answer = True
+    else:
+        confirm_answer =  False
+
     return fig_line_chart, \
            fig_radar_chart, \
            table1, \
@@ -614,7 +635,8 @@ def update_graph(crypto1, crypto2,n ,lin_log, data_type, picked_date, invest_val
            image1, \
            image2, \
            scorecard1, \
-           scorecard2
+           scorecard2, \
+           confirm_answer
 
 
 if __name__ == '__main__':
