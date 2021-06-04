@@ -297,7 +297,7 @@ html.Div([
 
     ], style={'display':'flex', 'height':'100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
 
-    dcc.ConfirmDialog(id='confirm', displayed =False, message = "Investment Date is before Currency starting date. \nPlease select a new date for more accurate data."),
+    dcc.ConfirmDialog(id='confirm', displayed =False, message = "Investment Date is before the first available data for one Currency. \nPlease select a new date for more accurate data."),
 
     html.Br(),
 
