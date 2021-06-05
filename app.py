@@ -14,7 +14,7 @@ from skimage import io
 from datetime import date
 from datetime import datetime
 
-
+#Import Excel file with the data
 currencies = pd.read_excel("Currencies.xlsx", "Currency",
                            engine='openpyxl')
 prices = pd.read_excel("Currencies.xlsx", "Prices",
@@ -26,149 +26,14 @@ pros = pd.read_excel("Currencies.xlsx", "Description",
 pictures = pd.read_excel("Currencies.xlsx", "Pictures",
                          engine='openpyxl')
 
-# # Create First Line Chart
-#
-# layout_line = dict(
-#     title=dict(
-#         text='Crypto Over Time',
-#         x=.5
-#         # This parameter puts the title text in a position from 0 to 1 acording to the x axis, i.e x=.5 is a centered title
-#     ),
-#     xaxis=dict(
-#         title='X Axis'
-#     ),
-#     yaxis=dict(
-#         title='Y Axis',
-#         range=(0, 80000)
-#     ),
-#     height=800,
-#     width=1500,
-#     paper_bgcolor='azure'
-# )
-#
-# data_line1 = dict(type='scatter',
-#                   x=prices[prices["Currency"] == "BTC"]['Date'],
-#                   y=prices[prices["Currency"] == "BTC"]['Closing Price (USD)'],
-#                   name='BTC'
-#                   )
-#
-# data_line2 = dict(type='scatter',
-#                   x=prices[prices["Currency"] == "ETH"]['Date'],
-#                   y=prices[prices["Currency"] == "ETH"]['Closing Price (USD)'],
-#                   name='ETH'
-#                   )
-#
-# data_line = [data_line1, data_line2]
-#
-# lineChart = go.Figure(data=data_line, layout=layout_line)
-#
-# # lineChart.show()
-#
-#
-# # Create Tables
-#
-# layout_table = dict(width=800, height=500)
-#
-# data_table1 = go.Table(header=dict(values=['Description'],
-#                                    line_color='darkslategray',
-#                                    fill_color='lightskyblue',
-#                                    align='left'),
-#
-#                        cells=dict(values=[pros[pros["Currency"] == "BTC"]["Description"]  # 1st column
-#                                           ],  # 2nd column
-#                                   line_color='darkslategray',
-#                                   fill_color='lightcyan',
-#                                   align='left'))
-#
-# table1 = go.Figure(data=data_table1, layout=layout_table)
-#
-# # table1.show()
-#
-# data_table2 = go.Table(header=dict(values=['Description'],
-#                                    line_color='darkslategray',
-#                                    fill_color='lightskyblue',
-#                                    align='left'),
-#
-#                        cells=dict(values=[pros[pros["Currency"] == "ETH"]["Description"]  # 1st column
-#                                           ],  # 2nd column
-#                                   line_color='darkslategray',
-#                                   fill_color='lightcyan',
-#                                   align='left'))
-#
-# table2 = go.Figure(data=data_table2, layout=layout_table)
-#
-# # table2.show()
-#
-# categories = list(attributes["Attribute"].unique())
-#
-# # Create Radar
-#
-# data_radar1 = go.Scatterpolar(
-#     r=attributes[attributes["Currency"] == "BTC"]["Amount"],
-#     theta=categories,
-#     fill='toself',
-#     name='BTC'
-# )
-#
-# data_radar2 = go.Scatterpolar(
-#     r=attributes[attributes["Currency"] == "ETH"]["Amount"],
-#     theta=categories,
-#     fill='toself',
-#     name='ETH'
-# )
-#
-# layout_radar = dict(polar=dict(
-#     radialaxis=dict(
-#         visible=False,
-#         range=[0, 100]
-#     )),
-#     showlegend=False
-# )
-#
-# data_radar = [data_radar1, data_radar2]
-#
-# radar = go.Figure(data=data_radar, layout=layout_radar)
-#
-# # radar.show()
-#
-#
-# ##Create Sub Plot
-#
-# # the 'rowspan' option inside the 'specs' defines the amount of rows the graph object in that position will ocupy
-# # Keep in mind that rows below and occupied should have 'None' as their value
-# # Naturally there is an equivalent 'colspan' option
-#
-# titles = ['Crypto 1', 'Radar', 'Crypto 2', "", "Time Series"]  # It ignores None type positions in the specs matrix
-#
-# plot = make_subplots(rows=2,
-#                      cols=3,
-#                      subplot_titles=titles,
-#                      specs=[[dict(type='table', rowspan=1), dict(type='polar'), dict(type='table', rowspan=1)],
-#                             [dict(type='xy', colspan=3), {}, {}]]
-#                      )
-#
-# # Both scatter and the bar type plots had several data traces, you need to add them iteratively
-# # In their respective position in the subplot
-# for i in range(len(data_line)):
-#     plot.add_trace(data_line[i], row=2, col=1)
-#
-# for i in range(len(data_radar)):
-#     plot.add_trace(data_radar[i], row=1, col=2)
-#
-# plot.add_trace(data_table1, row=1, col=1)
-# plot.add_trace(data_table2, row=1, col=3)
-#
-# plot.update_layout(height=800, title_text="Crypto Comparison")
-# # plot.show()
 
 
-# Create Dash Options
+# Create Dash Options for Dropdown
 crypto_options = currencies["Currency"]
 crypto_list = []
 for crypto in crypto_options:
     crypto_list.append({'label': crypto, 'value': crypto})
 
-crypto_list
 # The app itself
 
 app = dash.Dash(__name__)
@@ -179,19 +44,22 @@ app.layout = html.Div([
 ############################################# MAIN TITLE ##############################################
     html.Div([
     html.H1(['CRYPTO CURRENCIES COMPARISON'], style={'width': '100%','padding' : 20, 'text-align':'center', 'font-family':'Verdana','backgroundColor': '#0B3954', 'color': 'white'}),
-    html.Button('?', title = "This Dashboard was created with the purpose \n"
-                             "of comparing the hot topic regarding\n"
-                             "Cryptocurrencies and the main differences\n"
-                             "between them.\n"
-                             "\n"
-                             "The First section will help you understand\n"
-                             "the difference between the chosen currencies.\n"
-                             "\n"
-                             "The Second section tells you the story of \n"
-                             "investing in the cryptocurrency market and\n"
-                             "the possible profit that could have been made.\n",
+    html.Button('INFO', title = "This Dashboard was created with the purpose \n"
+                                 "of comparing the hot topic regarding\n"
+                                 "Cryptocurrencies and the main differences\n"
+                                 "between them.\n"
+                                 "\n"
+                                 "The First section will help you understand\n"
+                                 "the difference between the chosen currencies.\n"
+                                 "\n"
+                                 "The Second section tells you the story of \n"
+                                 "investing in the cryptocurrency market and\n"
+                                 "the possible profit that could have been made.\n"
+                                 "\n"
+                                 "Hovering the charts and buttons may show you\n"
+                                 "tooltips related with the charts or data.",
 
-                id='info', n_clicks=0, style = {'width':'2%','margin-top' : '0.5%','margin-left' : '2%','margin-right' : 'auto',
+                id='info', n_clicks=0, style = {'width':'3.5%','margin-top' : '0.5%','margin-left' : '2%','margin-right' : 'auto',
                                                                            'font-family': 'Verdana','backgroundColor': '#0B3954', 'color': 'white'})
     ]),
 ##################################### CRYPTO SELECTION ################################################
@@ -229,19 +97,36 @@ html.Div([
 
 ], style={'width': '100%','height' : '20%'}),
 
-######################################## TABLES AND RADAR #############################################
+    html.Div([
+        html.Button('?', title="The Radar Chart contains the main stats \n"
+                               "of the two Cryptocurrencies selected.\n"
+                               "If you hover with your mouse the node for\n"
+                               "each attribute you will be able to see a\n"
+                               "description of what it is and the values\n"
+                               "for the currency.\n"
+                               "\n"
+                               "In case you are not able to see the\n"
+                               "description, click in the legend to\n"
+                               "remove one of the currencies allowing\n"
+                               "you to see only one currency at the time.\n",
+
+                    id='info_radar', n_clicks=0, style={'font-family': 'Verdana', 'backgroundColor': '#0B3954', 'color': 'white'})],
+        style={'width': '3.5%', 'height': '2%', 'margin-top': '2%', 'margin-left': '35%', 'margin-right': 'auto'}),
+
+    ######################################## TABLES AND RADAR #############################################
 
     html.Div([
         html.Div([
         dcc.Graph(id='Table1')], style={'width':'25%', 'display': 'flex','margin-left' : '1%','margin-right' : 'auto','font-family':'Verdana' }, className='box'),
 
-        html.Div([
-        dcc.Graph(id='radar_chart')], style={'width':'50%', 'display': 'flex','font-family':'Verdana' }, className='box'),
+    html.Div([
+            dcc.Graph(id='radar_chart')], style={'width': '50%', 'display': 'flex', 'font-family': 'Verdana'},
+            className='box'),
 
         html.Div([
         dcc.Graph(id='Table2')], style={'width':'25%', 'display': 'flex','margin-left' : 'auto','margin-right' : '5%','font-family':'Verdana' }, className='box')],
 
-        style={'width': "100%", 'height':'20%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '3%','margin-bottom' : '1%','backgroundColor': 'white'}, className='box'),
+        style={'width': "100%", 'height':'20%', 'display': 'flex','margin-left' : '5%','margin-right' : '5%','margin-top' : '1%','margin-bottom' : '1%','backgroundColor': 'white'}, className='box'),
 
 ######################################## INVESTMENT ANALYSIS ###########################################
 
@@ -271,8 +156,24 @@ html.Div([
                 style = {'height': 40, 'fontSize': 18, 'text-align':'center'}
             )], style={'width':'25%', 'height': '100%','margin-left' : '2%','margin-right' : '2%', 'text-align':'center'}),
 
-            html.Button('CALCULATE', id='submit-val', n_clicks=0, style = {'width':100,'height': 40, 'margin-top' : '2%',
-                                                                           'font-family': 'Verdana'}),
+            html.Button('CALCULATE', id='submit-val', n_clicks=0, title= "The Calculation of the profit is based on\n"
+                                                                         "the Amount Invested in the date selected.\n"
+                                                                         "The formula uses the price of the currency\n"
+                                                                         "on the date selected.\n"
+                                                                         "\n"
+                                                                         "It divides the invested amount by that price.\n"
+                                                                         "This gives the number of currencies that you\n"
+                                                                         "can buy on that date with that amount.\n"
+                                                                         "\n"
+                                                                         "Then it multiplies the number of currencies\n"
+                                                                         "with the most recent price available of that\n"
+                                                                         "currency, giving the total profit amount.\n"
+                                                                         "\n"
+                                                                         "The last day available is the 26th of May 2021.\n"
+                                                                         "In case the invested date selected is before the\n"
+                                                                         "first date available for the currency, it uses\n"
+                                                                         "the first price available.",
+            style = {'width':100,'height': 40, 'margin-top' : '2%', 'font-family': 'Verdana'}),
 
 
             html.Div([
@@ -297,7 +198,16 @@ html.Div([
 
     ], style={'display':'flex', 'height':'100%','margin-left' : '5%','margin-right' : '5%','backgroundColor': '#F5F3F6','padding':'1%','font-family':'Verdana'}),
 
-    dcc.ConfirmDialog(id='confirm', displayed =False, message = "Investment Date is before the first available data for one Currency. \nPlease select a new date for more accurate data."),
+    dcc.ConfirmDialog(id='confirm', displayed =False, message = "\n"
+                                                                "WARNING\n"
+                                                                "\n"
+                                                                "Investment Date is before the first available data\n"
+                                                                "for one of the Currencies.\n"
+                                                                "\n"
+                                                                "Please select a new date for more accurate data.\n"
+                                                                "\n"
+                                                                "The calculation will be made based on the first\n"
+                                                                "date available."),
 
     html.Br(),
 
@@ -343,6 +253,41 @@ html.Div([
      ], style={'display':'flex','margin-left' : '15%','margin-right' : '5%'}),
 
 ######################################## LINE CHART #############################################
+        html.Div([
+                html.Button('?', title="The Line Chart contains the values over \n"
+                                       "time for of the two Cryptocurrencies selected.\n"
+                                       "It shows by default the investment profit\n"
+                                       "to tell you the story of what you could have\n"
+                                       "gained/lost.\n"
+                                       "\n"
+                                       "You can also select the 'Daily Change'\n"
+                                       "to analyse the volatility of each currency.\n"
+                                       "\n"
+                                       "The last option is the 'Daily Value' that\n"
+                                       "shows the daily price of each currency.\n"
+                                       "\n"
+                                       "It is interesting to see that the profit may\n"
+                                       "be very different from the daily value.\n"
+                                       "\n"
+                                       "A good example is the default option. It shows\n"
+                                       "BTC, which is very well known and expensive,\n"
+                                       "versus ETH, also well known but with a lower\n"
+                                       "price.\n"
+                                       "The interesting part is that although BTC has\n"
+                                       "reached its maximum value recently, ETH is\n"
+                                       "still much more profitable by far, with an\n"
+                                       "investment in the beginning of 2021.\n"
+                                       "This happens because what really matters\n"
+                                       "is the gained percentage and not the real\n"
+                                       "value of the currency.\n"
+                                       "\n"
+                                       "A currency that costs 10 000 USD and increases\n"
+                                       "to 15 000 USD 'only' gained 50%, while a\n"
+                                       "currency that costs 1 USD and increases\n"
+                                       "to 2 USD gained 100%.",
+
+                            id='info_line', n_clicks=0, style={'font-family': 'Verdana', 'backgroundColor': '#0B3954', 'color': 'white'})],
+                style={'width': '3.5%', 'height': '2%', 'margin-top': '0%', 'margin-left': '5%', 'margin-right': 'auto'}),
 
     dcc.Graph(id='line_chart'),
 
