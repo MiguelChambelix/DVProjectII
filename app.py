@@ -110,7 +110,7 @@ html.Div([
                                "remove one of the currencies allowing\n"
                                "you to see only one currency at the time.\n",
 
-                    id='info_radar', n_clicks=0, style={'font-family': 'Verdana', 'backgroundColor': '#0B3954', 'color': 'white'})],
+                    id='info_radar', n_clicks=0, style={'font-family': 'Verdana', 'backgroundColor': 'white', 'color': 'black'})],
         style={'width': '3.5%', 'height': '2%', 'margin-top': '2%', 'margin-left': '35%', 'margin-right': 'auto'}),
 
     ######################################## TABLES AND RADAR #############################################
@@ -286,7 +286,7 @@ html.Div([
                                        "currency that costs 1 USD and increases\n"
                                        "to 2 USD gained 100%.",
 
-                            id='info_line', n_clicks=0, style={'font-family': 'Verdana', 'backgroundColor': '#0B3954', 'color': 'white'})],
+                            id='info_line', n_clicks=0, style={'font-family': 'Verdana', 'backgroundColor': 'white', 'color': 'black'})],
                 style={'width': '3.5%', 'height': '2%', 'margin-top': '0%', 'margin-left': '5%', 'margin-right': 'auto'}),
 
     dcc.Graph(id='line_chart'),
