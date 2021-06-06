@@ -319,8 +319,9 @@ html.Div([
                                            "Miguel Chambel, m20200326\n"
                                            "\n"
                                            "Sources: \n"
-                                           "https://www.ig.com/en/cryptocurrency-trading/cryptocurrency-comparison \n"
+                                           "https://www.ig.com/en/cryptocurrency-trading/cryptocurrency-comparison\n"
                                            "https://coinmarketcap.com/\n"
+                                           "https://www.coindesk.com/\n"
                                            "\n"
                                            "Data extracted in the 1st of June of 2021\n"
                                            "Last Date available is the 26th of May of 2021.",
